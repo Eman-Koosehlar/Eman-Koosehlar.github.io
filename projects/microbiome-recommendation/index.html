@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Microbiome Recommendation Engine — Eman Koosehlar</title>
+  <meta name="description" content="Non-clinical educational demonstration: gut, vaginal and oral microbiome scores, dysbiosis-related metrics, an interactive taxa-to-recommendation graph and food examples, all from synthetic data.">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="assets/microbiome.css">
+</head>
+<body>
+  <a class="skip-link" href="#analysis">Skip to the demo</a>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<symbol id="i-leafy" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 48C12 26 28 12 52 12C52 36 40 52 14 52Z" fill="currentColor" fill-opacity=".14"/><path d="M14 50L42 22M30 36H40M24 42H32"/></g></symbol>
+<symbol id="i-beans" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20C8 24 8 40 20 46C30 50 40 44 38 34C36 26 28 16 18 20Z" fill="currentColor" fill-opacity=".14"/><path d="M40 14C50 14 58 24 54 36C52 44 46 50 40 48" /><circle cx="22" cy="32" r="1.6" fill="currentColor"/></g></symbol>
+<symbol id="i-oats" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M32 58V16"/><path d="M32 26C24 24 22 16 24 10C30 12 32 18 32 26Z M32 26C40 24 42 16 40 10C34 12 32 18 32 26Z" fill="currentColor" fill-opacity=".14"/><path d="M32 40C24 38 22 30 24 24C30 26 32 32 32 40Z M32 40C40 38 42 30 40 24C34 26 32 32 32 40Z" fill="currentColor" fill-opacity=".14"/><path d="M32 54C26 52 24 46 26 41M32 54C38 52 40 46 38 41"/></g></symbol>
+<symbol id="i-berries" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="42" r="10" fill="currentColor" fill-opacity=".14"/><circle cx="42" cy="42" r="10" fill="currentColor" fill-opacity=".14"/><circle cx="32" cy="24" r="10" fill="currentColor" fill-opacity=".14"/><path d="M32 14V8L40 6"/></g></symbol>
+<symbol id="i-yogurt" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 24H48L44 56H20Z" fill="currentColor" fill-opacity=".14"/><path d="M14 24H50M22 14H42M26 34H38"/></g></symbol>
+<symbol id="i-ferment" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10H42V18C48 20 48 26 48 32V52C48 55 46 56 44 56H20C18 56 16 55 16 52V32C16 26 16 20 22 18Z" fill="currentColor" fill-opacity=".14"/><path d="M22 18H42"/><circle cx="28" cy="36" r="3"/><circle cx="38" cy="44" r="3"/><circle cx="30" cy="48" r="2"/></g></symbol>
+<symbol id="i-olive" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M28 6H36V20L43 31V54C43 56 42 58 40 58H24C22 58 21 56 21 54V31L28 20Z" fill="currentColor" fill-opacity=".14"/><path d="M28 12H36"/><ellipse cx="32" cy="44" rx="6" ry="8"/></g></symbol>
+<symbol id="i-nuts" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8C46 12 54 30 46 46C40 58 24 58 18 46C10 30 18 12 32 8Z" fill="currentColor" fill-opacity=".14"/><path d="M32 10V54M24 24C28 28 28 34 24 40M40 24C36 28 36 34 40 40"/></g></symbol>
+<symbol id="i-onion" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8C32 18 14 24 14 40C14 52 22 58 32 58C42 58 50 52 50 40C50 24 32 18 32 8Z" fill="currentColor" fill-opacity=".14"/><path d="M32 14C25 28 24 46 32 58M32 14C39 28 40 46 32 58"/></g></symbol>
+<symbol id="i-apple" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M32 22C24 14 10 20 12 36C14 50 24 58 32 54C40 58 50 50 52 36C54 20 40 14 32 22Z" fill="currentColor" fill-opacity=".14"/><path d="M32 22C32 14 36 10 42 8"/></g></symbol>
+<symbol id="i-fish" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 32C16 16 38 14 48 32C38 50 16 48 6 32Z" fill="currentColor" fill-opacity=".14"/><path d="M48 32L60 20V44Z"/><circle cx="17" cy="30" r="1.8" fill="currentColor"/><path d="M28 24C32 30 32 34 28 40"/></g></symbol>
+<symbol id="i-tea" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 26H46V40C46 49 40 55 28 55C16 55 10 49 10 40Z" fill="currentColor" fill-opacity=".14"/><path d="M46 30H50C57 30 57 42 47 43"/><path d="M20 8C15 13 25 15 20 20M32 8C27 13 37 15 32 20"/></g></symbol>
+<symbol id="i-carrot" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M46 14C54 22 54 28 46 34L16 56C12 58 8 54 10 50L30 18C34 10 40 10 46 14Z" fill="currentColor" fill-opacity=".14"/><path d="M48 12L56 6M52 16L60 14M24 36L32 40M18 46L26 50"/></g></symbol>
+<symbol id="i-chips" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 12H48L46 56H18Z" fill="currentColor" fill-opacity=".14"/><path d="M16 12L20 16L24 12L28 16L32 12L36 16L40 12L44 16L48 12"/><circle cx="32" cy="36" r="8"/></g></symbol>
+<symbol id="i-soda" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 22H46L42 58H22Z" fill="currentColor" fill-opacity=".14"/><path d="M16 22H48M34 22L40 6H48"/><circle cx="28" cy="38" r="2"/><circle cx="36" cy="46" r="2"/><circle cx="31" cy="50" r="1.4"/></g></symbol>
+<symbol id="i-candy" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="26" r="17" fill="currentColor" fill-opacity=".14"/><path d="M30 26m-9 0a9 9 0 1 1 9 9M30 26m-3 0a3 3 0 1 1 3 3"/><path d="M42 39L54 58"/></g></symbol>
+<symbol id="i-sausage" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="24" width="48" height="18" rx="9" transform="rotate(-30 32 33)" fill="currentColor" fill-opacity=".14"/><path d="M17 22L22 28M44 40L49 46M30 30L36 38"/></g></symbol>
+<symbol id="i-wine" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 8H44C47 26 41 36 32 36C23 36 17 26 20 8Z" fill="currentColor" fill-opacity=".14"/><path d="M32 36V56M22 58H42M19 20H45"/></g></symbol>
+<symbol id="i-cake" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 42H56V54H8Z" fill="currentColor" fill-opacity=".14"/><path d="M8 42L32 18L56 42M8 48H56"/><circle cx="32" cy="12" r="3.5"/></g></symbol>
+</defs></svg>
+
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="../../index.html" aria-label="Eman Koosehlar — home">Eman Koosehlar</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">☰</button>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="../../index.html#projects">← Portfolio</a>
+        <a href="../health-kg/index.html">Health KG</a>
+        <a href="../microbiome-recommendation/index.html" aria-current="page">Microbiome</a>
+        <a href="../neoantigen-vaccine/index.html">mRNA vaccine</a>
+        <a href="../adc-design/index.html">ADC design</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap pg-hero">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Project 02 · Metagenomics · Recommendation graph</div>
+        <h1>Microbiome Recommendation Engine</h1>
+        <p class="lead">Three body sites, one transparent pipeline: synthetic microbial profiles become site scores and dysbiosis-related metrics, flow through taxa → function → health-association → recommendation graphs, and end in an explainable report with food and supplement examples.</p>
+        <div class="tags"><span>Gut</span><span>Vaginal</span><span>Oral</span><span>Synthetic data</span><span>Explainable</span></div>
+      </div>
+      <div class="notice"><strong>Illustrative and non-clinical.</strong> Every abundance, score, target and recommendation here is based on <strong>synthetic data</strong> and teaching thresholds. Nothing is a clinical assessment, a diagnosis, or advice to start or stop any food, supplement or treatment. Talk to a qualified clinician about symptoms or health decisions.</div>
+    </section>
+
+    <section id="analysis" class="wrap">
+      <div class="panel panel-pad ctx-bar">
+        <div class="kicker">01 · Synthetic cohort &amp; context</div>
+        <div class="ctx-grid">
+          <label>Synthetic profile<select id="profile"></select></label>
+          <label>BMI (context)<input id="bmi" type="number" min="15" max="50" step="0.1" value="27.4"></label>
+          <label>Diet<select id="diet"><option>Mediterranean-style</option><option>Mixed diet</option><option>Vegetarian</option><option>High ultra-processed-food pattern</option></select></label>
+          <label>Lifestyle<select id="lifestyle"><option>Moderately active</option><option>Low activity / irregular sleep</option><option>Highly active</option></select></label>
+          <button id="analyze" class="btn primary" type="button">Analyze profile →</button>
+        </div>
+      </div>
+
+      <div class="sec-head"><div class="kicker">02 · Scores by body site</div><h2>Gut, vaginal and oral microbiome</h2></div>
+      <div id="scorecards" class="scorecards" role="group" aria-label="Site scores"></div>
+      <div class="state-legend"><span class="st-ok"><i></i>75–100 Balanced pattern</span><span class="st-mid"><i></i>50–74 Mild shift</span><span class="st-risk"><i></i>0–49 Marked shift</span><span class="muted">illustrative thresholds</span></div>
+    </section>
+
+    <section id="results" class="wrap sec">
+      <div id="site-tabs" class="site-tabs" role="tablist" aria-label="Choose a body site"></div>
+      <div class="panel panel-pad">
+        <div id="site-head" class="site-head"></div>
+        <div class="two-col">
+          <div>
+            <div class="kicker">Synthetic relative abundance (genus level)</div>
+            <div id="bars" class="bars"></div>
+            <div id="bar-legend" class="bar-legend"></div>
+          </div>
+          <div>
+            <div class="kicker">Dysbiosis-related metrics (illustrative)</div>
+            <div id="metrics" class="metrics"></div>
+            <details class="adjust"><summary>Adjust the synthetic abundances</summary>
+              <p class="fine">Edit the made-up profile to see how scores and graph respond. “Other” fills the remainder to 100%.</p>
+              <div id="taxa-sliders" class="tsliders"></div>
+              <button id="reset-site" class="btn small" type="button">Reset this site to the selected profile</button>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="graph" class="wrap sec">
+      <div class="section-head"><span>03</span><h2>Interactive knowledge graph</h2><label class="anim-toggle"><input type="checkbox" id="anim" checked> animate flow</label></div>
+      <p class="muted narrow">Taxa feed functional themes, which feed health-association contexts, which determine recommendation priority. Hover or click any node to trace its connections; node colors show how far each is from its illustrative target.</p>
+      <div class="kg-scroll" id="kg" role="region" aria-label="Knowledge graph (scrolls horizontally on small screens)" tabindex="0"></div>
+      <div class="kg-legend"><span class="st-ok"><i></i>near target</span><span class="st-mid"><i></i>shifted</span><span class="st-risk"><i></i>markedly shifted</span><span style="--c:var(--blue)"><i></i>prioritized recommendation</span><span style="--c:var(--off)"><i></i>low priority</span></div>
+      <div class="panel panel-pad node-info" id="node-info" aria-live="polite"></div>
+    </section>
+
+    <section id="report-sec" class="wrap sec">
+      <div class="section-head"><span>04</span><h2>Explainable report</h2></div>
+      <p class="muted narrow">Each site score is a weighted sum of simple components. The table shows what was measured, the toy target, and exactly how many points each component contributed or lost.</p>
+      <div class="panel panel-pad" id="report" aria-live="polite"></div>
+    </section>
+
+    <section id="foods" class="wrap sec">
+      <div class="section-head"><span>05</span><h2>Food examples for the selected site</h2></div>
+      <p class="muted narrow">Ordered by how strongly the linked functional themes deviate from target in the current synthetic profile. These are illustrative dietary patterns drawn from general nutrition research — not individual diet plans. Icons are original illustrations.</p>
+      <div class="food-cols">
+        <div><h3 class="col-title eat">Eat / prioritize</h3><div id="eat" class="food-list"></div></div>
+        <div><h3 class="col-title limit">Limit</h3><div id="limit" class="food-list"></div></div>
+      </div>
+    </section>
+
+    <section id="extras" class="wrap sec">
+      <div class="section-head"><span>06</span><h2>Habits &amp; supplement examples</h2></div>
+      <div class="extras-grid">
+        <div class="panel panel-pad"><h3 class="col-title">Habits to discuss</h3><ul id="habits" class="habits"></ul></div>
+        <div>
+          <div class="notice" style="margin-bottom:12px"><strong>Supplement examples are demonstrations.</strong> “Demo links” point to neutral, public educational references (NIH). They are not product recommendations, endorsements, or dosing advice.</div>
+          <div id="supps" class="supps"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="interventions-sec" class="wrap sec">
+      <div class="section-head"><span>07</span><h2>Ranked lifestyle &amp; dietary actions</h2></div>
+      <p class="muted narrow">Scores combine illustrative factors such as relevance, evidence coverage and fit with the selected context. They demonstrate recommendation logic — not clinical efficacy.</p>
+      <div id="interventions" class="rec-list"></div>
+      <div class="panel panel-pad report-box" id="ctx-report" style="margin-top:16px"></div>
+    </section>
+
+    <section class="wrap sec">
+      <div class="section-head"><span>08</span><h2>Method &amp; limitations</h2></div>
+      <div class="method-grid">
+        <div class="panel panel-pad"><b class="mono">Synthetic by design</b><p>All profiles are hand-written teaching examples. No sequencing data, patient data or experimental results are shown or implied.</p></div>
+        <div class="panel panel-pad"><b class="mono">Site-specific logic</b><p>Gut, vaginal and oral ecosystems follow different rules — e.g. low diversity is typical in the vagina but not the gut — so each site uses its own components.</p></div>
+        <div class="panel panel-pad"><b class="mono">What it cannot do</b><p>No strain-level resolution, absolute abundance, metabolomics, host data, or validated cut-offs. Microbiome interpretation is highly context-dependent.</p></div>
+      </div>
+      <details class="refs"><summary>Background reading (verify details before citing)</summary>
+        <ul>
+          <li>Ravel J. et al. “Vaginal microbiome of reproductive-age women.” <i>PNAS</i> 108 (Suppl 1), 2011 — community state types.</li>
+          <li>Socransky S.S. et al. “Microbial complexes in subgingival plaque.” <i>J Clin Periodontol</i> 25, 1998 — periodontal “complexes”.</li>
+          <li>Sokol H. et al. “<i>Faecalibacterium prausnitzii</i> is an anti-inflammatory commensal bacterium…” <i>PNAS</i> 105, 2008.</li>
+          <li>Everard A. et al. “Cross-talk between <i>Akkermansia muciniphila</i> and intestinal epithelium controls diet-induced obesity.” <i>PNAS</i> 110, 2013.</li>
+        </ul></details>
+    </section>
+
+    <div class="disclaimer-bar"><div class="wrap"><strong>PORTFOLIO DEMONSTRATION — NOT A MEDICAL DEVICE</strong><span>Synthetic data and illustrative logic only. It does not diagnose disease, define a “healthy” microbiome, or prescribe treatment.</span></div></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap"><span>© 2026 Eman Koosehlar</span><span>Educational portfolio demonstration</span><a href="../../index.html#projects">Back to portfolio ↑</a></div>
+  </footer>
+  <script src="../../assets/js/config.js"></script>
+  <script src="../../assets/js/site.js"></script>
+  <script src="../../assets/js/kgraph.js"></script>
+  <script src="assets/microbiome.js"></script>
+</body>
+</html>

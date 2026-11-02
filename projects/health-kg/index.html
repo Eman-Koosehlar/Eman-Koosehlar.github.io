@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Health Knowledge Graph — Eman Koosehlar</title>
+  <meta name="description" content="Non-clinical educational demonstration: an interactive human-body view with organ-level scores, an animated knowledge graph and an explainable report, using synthetic data.">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="assets/health.css">
+</head>
+<body>
+  <a class="skip-link" href="#explorer">Skip to the demo</a>
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="../../index.html" aria-label="Eman Koosehlar — home">Eman Koosehlar</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">☰</button>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="../../index.html#projects">← Portfolio</a>
+        <a href="../health-kg/index.html" aria-current="page">Health KG</a>
+        <a href="../microbiome-recommendation/index.html">Microbiome</a>
+        <a href="../neoantigen-vaccine/index.html">mRNA vaccine</a>
+        <a href="../adc-design/index.html">ADC design</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap pg-hero">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Project 01 · Computational health · Knowledge graph</div>
+        <h1>Health Knowledge Graph</h1>
+        <p class="lead">From input factors to organ-level scores — and the reasons behind every point. An interactive prototype showing how structured measurements can flow through a transparent knowledge graph to health states, organs and illustrative recommendations.</p>
+        <div class="tags"><span>Synthetic data</span><span>Explainable scoring</span><span>Interactive SVG</span><span>Knowledge graph</span></div>
+      </div>
+      <div class="notice"><strong>Non-clinical educational demonstration.</strong> All values, ranges, weights and scores are synthetic or illustrative. This is <strong>not</strong> a diagnostic, screening, monitoring or treatment system, does not use real patient data, and must not be used to make health decisions. Speak to a qualified clinician about your health.</div>
+    </section>
+
+    <section id="explorer" class="wrap">
+      <div class="demo-head">
+        <div><span class="kicker">01 · Interactive explorer</span><h2>Choose a synthetic profile, then adjust the inputs</h2></div>
+        <div class="demo-actions no-print">
+          <label class="sr-only" for="preset">Synthetic profile</label><select id="preset"></select>
+          <button class="btn small" id="reset" type="button">Reset demo</button>
+        </div>
+      </div>
+      <div class="workspace">
+        <aside class="panel controls no-print" aria-label="Input factors">
+          <div class="controls-title"><span>INPUT FACTORS</span><small>synthetic · illustrative bands</small></div>
+          <div id="controls"></div>
+          <p class="fine"><i class="bandbar st-ok"></i> within illustrative range · <i class="bandbar st-mid"></i> outside · <i class="bandbar st-risk"></i> well outside</p>
+        </aside>
+
+        <div class="panel viz">
+          <div class="viz-top">
+            <div class="overall st-ok" id="overall">
+              <svg viewBox="0 0 120 120" class="ring" aria-hidden="true"><circle cx="60" cy="60" r="52" class="ring-bg"/><circle cx="60" cy="60" r="52" class="ring-arc" id="ring-arc" transform="rotate(-90 60 60)" stroke-dasharray="0 327"/></svg>
+              <div class="ring-text"><b id="overall-num">–</b><small>/ 100</small></div>
+            </div>
+            <div class="overall-copy">
+              <span class="kicker">Overall health score (demo)</span>
+              <h3><span id="overall-label">–</span></h3>
+              <p id="overall-text"></p>
+              <div class="state-legend"><span class="st-ok"><i></i>75–100 Favorable</span><span class="st-mid"><i></i>50–74 Watch</span><span class="st-risk"><i></i>0–49 Attention</span></div>
+            </div>
+          </div>
+
+          <div class="body-wrap" id="body-wrap">
+            <svg id="body-svg" viewBox="0 0 600 660" role="group" aria-label="Human body with organ scores. Select an organ to explain its score.">
+              <defs>
+                <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <linearGradient id="scanG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8ee7b2" stop-opacity="0"/><stop offset=".5" stop-color="#8ee7b2" stop-opacity=".35"/><stop offset="1" stop-color="#8ee7b2" stop-opacity="0"/></linearGradient>
+                <clipPath id="bodyClip"><g transform="translate(150 0)"><ellipse cx="160" cy="62" rx="38" ry="48"/><path d="M100 134C130 126 190 126 220 134 240 140 242 170 238 220 236 270 232 330 224 372 222 400 214 420 160 428 106 420 98 400 96 372 88 330 84 270 82 220 78 170 80 140 100 134Z"/></g></clipPath>
+              </defs>
+              <g transform="translate(150 0)">
+                <g class="silhouette">
+                  <ellipse cx="160" cy="62" rx="38" ry="48"/>
+                  <path d="M146 104V132H174V104"/>
+                  <path d="M100 134C130 126 190 126 220 134 240 140 242 170 238 220 236 270 232 330 224 372 222 400 214 420 160 428 106 420 98 400 96 372 88 330 84 270 82 220 78 170 80 140 100 134Z"/>
+                  <path d="M82 140C60 150 50 190 46 240L40 330C38 344 56 346 60 332L74 250C78 220 84 190 90 168Z"/>
+                  <path d="M238 140C260 150 270 190 274 240L280 330C282 344 264 346 260 332L246 250C242 220 236 190 230 168Z"/>
+                  <path d="M110 410C108 470 104 540 100 590L96 640H128L136 590C142 540 152 480 160 430Z"/>
+                  <path d="M210 410C212 470 216 540 220 590L224 640H192L184 590C178 540 168 480 160 430Z"/>
+                </g>
+                <g clip-path="url(#bodyClip)"><rect class="scan" x="70" y="0" width="180" height="40" fill="url(#scanG)"/></g>
+                <path class="faint" d="M160 132V160M160 160L148 176M160 160L172 176"/>
+                <path class="faint" d="M180 282C204 276 222 290 214 312 208 328 186 324 180 310Z"/>
+                <path class="faint" d="M124 372C140 362 180 362 196 372 208 384 194 396 170 394 146 392 126 398 128 410 130 420 190 416 194 408"/>
+
+                <g class="organ brain" data-organ="brain" tabindex="0" role="button" aria-pressed="false"><title>Brain</title>
+                  <path class="shape" d="M130 58C128 38 146 28 160 32 174 28 192 38 190 58 192 74 176 84 160 82 144 84 128 74 130 58Z"/>
+                  <path class="fold" d="M160 33V81M138 52C146 48 150 56 158 52M182 52C174 48 170 56 162 52M140 68C148 64 152 72 158 68M180 68C172 64 168 72 162 68"/></g>
+                <g class="organ lungs" data-organ="lungs" tabindex="0" role="button" aria-pressed="false"><title>Lungs</title>
+                  <path class="shape" d="M148 158C130 150 108 170 104 206 100 242 108 264 126 264 140 264 148 248 148 224Z"/>
+                  <path class="shape" d="M172 158C190 150 212 170 216 206 220 242 212 264 194 264 180 264 172 248 172 224Z"/>
+                  <path class="fold" d="M140 180C128 190 120 210 122 236M180 180C192 190 200 210 198 236"/></g>
+                <g class="organ liver" data-organ="liver" tabindex="0" role="button" aria-pressed="false"><title>Liver</title>
+                  <path class="shape" d="M100 272C124 262 162 266 190 278 194 298 174 316 142 316 116 316 100 300 100 272Z"/></g>
+                <g class="organ kidneys" data-organ="kidneys" tabindex="0" role="button" aria-pressed="false"><title>Kidneys</title>
+                  <path class="shape" d="M122 326C108 326 106 344 114 354 122 362 134 354 134 342 134 334 130 326 122 326Z"/>
+                  <path class="shape" d="M198 326C212 326 214 344 206 354 198 362 186 354 186 342 186 334 190 326 198 326Z"/></g>
+                <g class="organ heart" data-organ="heart" tabindex="0" role="button" aria-pressed="false"><title>Heart</title>
+                  <path class="shape" d="M164 250C148 238 140 226 144 212 148 200 162 200 166 210 170 200 186 200 190 214 192 228 180 240 164 250Z"/></g>
+
+                <g class="nums" aria-hidden="true">
+                  <text class="inum" x="160" y="63" data-score="brain">–</text>
+                  <text class="inum" x="126" y="215" data-score="lungs">–</text>
+                  <text class="inum" x="146" y="296" data-score="liver">–</text>
+                  <text class="inum" x="166" y="231" data-score="heart">–</text>
+                  <text class="inum small" x="124" y="344" data-score="kidneys">–</text>
+                </g>
+              </g>
+              <g class="organ pill" data-organ="brain" tabindex="0" role="button" aria-pressed="false">
+      <line class="leader" x1="142" y1="64" x2="300" y2="58"/>
+      <rect class="pillbox" x="10" y="40" width="132" height="48" rx="9"/>
+      <text class="pnum" x="24" y="73" data-score="brain">–</text>
+      <text class="plabel" x="66" y="61">BRAIN</text>
+      <text class="pstat" x="66" y="77" data-status="brain">–</text></g>
+              <g class="organ pill" data-organ="lungs" tabindex="0" role="button" aria-pressed="false">
+      <line class="leader" x1="142" y1="194" x2="272" y2="214"/>
+      <rect class="pillbox" x="10" y="170" width="132" height="48" rx="9"/>
+      <text class="pnum" x="24" y="203" data-score="lungs">–</text>
+      <text class="plabel" x="66" y="191">LUNGS</text>
+      <text class="pstat" x="66" y="207" data-status="lungs">–</text></g>
+              <g class="organ pill" data-organ="liver" tabindex="0" role="button" aria-pressed="false">
+      <line class="leader" x1="142" y1="292" x2="290" y2="292"/>
+      <rect class="pillbox" x="10" y="268" width="132" height="48" rx="9"/>
+      <text class="pnum" x="24" y="301" data-score="liver">–</text>
+      <text class="plabel" x="66" y="289">LIVER</text>
+      <text class="pstat" x="66" y="305" data-status="liver">–</text></g>
+              <g class="organ pill" data-organ="heart" tabindex="0" role="button" aria-pressed="false">
+      <line class="leader" x1="458" y1="224" x2="316" y2="228"/>
+      <rect class="pillbox" x="458" y="200" width="132" height="48" rx="9"/>
+      <text class="pnum" x="472" y="233" data-score="heart">–</text>
+      <text class="plabel" x="514" y="221">HEART</text>
+      <text class="pstat" x="514" y="237" data-status="heart">–</text></g>
+              <g class="organ pill" data-organ="kidneys" tabindex="0" role="button" aria-pressed="false">
+      <line class="leader" x1="458" y1="344" x2="348" y2="342"/>
+      <rect class="pillbox" x="458" y="320" width="132" height="48" rx="9"/>
+      <text class="pnum" x="472" y="353" data-score="kidneys">–</text>
+      <text class="plabel" x="514" y="341">KIDNEYS</text>
+      <text class="pstat" x="514" y="357" data-status="kidneys">–</text></g>
+            </svg>
+            <div class="organ-cards" role="group" aria-label="Organ scores"><button type="button" class="organ-card organ-btn" data-organ="heart" aria-pressed="false"><i class="dotc"></i><span class="nm">Heart</span><b data-score="heart">–</b><small data-status="heart">–</small></button><button type="button" class="organ-card organ-btn" data-organ="lungs" aria-pressed="false"><i class="dotc"></i><span class="nm">Lungs</span><b data-score="lungs">–</b><small data-status="lungs">–</small></button><button type="button" class="organ-card organ-btn" data-organ="brain" aria-pressed="false"><i class="dotc"></i><span class="nm">Brain</span><b data-score="brain">–</b><small data-status="brain">–</small></button><button type="button" class="organ-card organ-btn" data-organ="liver" aria-pressed="false"><i class="dotc"></i><span class="nm">Liver</span><b data-score="liver">–</b><small data-status="liver">–</small></button><button type="button" class="organ-card organ-btn" data-organ="kidneys" aria-pressed="false"><i class="dotc"></i><span class="nm">Kidneys</span><b data-score="kidneys">–</b><small data-status="kidneys">–</small></button></div>
+          </div>
+          <p class="fine center">Select an organ — in the body, the list or the graph — to open its explanation. Visual states: green / yellow / red.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="graph" class="wrap sec">
+      <div class="section-head"><span>02</span><h2>Animated knowledge graph</h2>
+        <label class="anim-toggle no-print"><input type="checkbox" id="anim" checked> animate flow</label></div>
+      <p class="muted narrow">Factors feed health-state nodes, which load organs; recommendations are surfaced by active states and linked to the organs they aim to support. Flowing, thicker lines mean a more active path. <b>Hover or click</b> any node to trace its upstream and downstream connections.</p>
+      <div class="kg-scroll" id="kg" role="region" aria-label="Knowledge graph (scrolls horizontally on small screens)" tabindex="0"></div>
+      <div class="kg-legend"><span class="st-ok"><i></i>within range / favorable</span><span class="st-mid"><i></i>outside / watch</span><span class="st-risk"><i></i>well outside / attention</span><span style="--c:var(--blue)"><i></i>active recommendation</span><span style="--c:var(--off)"><i></i>inactive</span></div>
+      <div class="panel panel-pad node-info" id="node-info" aria-live="polite"></div>
+    </section>
+
+    <section id="report" class="wrap sec">
+      <div class="section-head"><span>03</span><h2>Explainable report</h2><button class="btn small no-print" id="print" type="button" style="margin-left:auto">Print / save ↗</button></div>
+      <p class="muted narrow">Every deduction can be traced from an input factor, through a health state, to an organ. Weights are teaching values chosen for this demo — not validated clinical coefficients.</p>
+      <div class="panel panel-pad">
+        <div id="organ-tabs" class="organ-tabs no-print" role="tablist" aria-label="Choose an organ to explain"></div>
+        <div id="organ-report" aria-live="polite"></div>
+        <div id="overall-report" class="overall-report"></div>
+      </div>
+    </section>
+
+    <section id="recs" class="wrap sec">
+      <div class="section-head"><span>04</span><h2>Illustrative recommendation categories</h2></div>
+      <p class="muted narrow">Candidate actions are retrieved from a small, hand-written demonstration list and ranked by how strongly the active health states point to them. They are generic wellness themes, not prescriptions, and never replace professional advice.</p>
+      <div id="rec-filters" class="rec-filters no-print" role="group" aria-label="Filter by category"></div>
+      <div id="rec-grid" class="rec-grid"></div>
+    </section>
+
+    <section id="method" class="wrap sec">
+      <div class="section-head"><span>05</span><h2>How the demo is built</h2></div>
+      <div class="method-grid">
+        <div class="panel panel-pad"><b class="mono">A · Factors → severity</b><p>Each input is mapped to a 0–1 severity with a simple piecewise-linear band curve. The curves are illustrative teaching values, not clinical cut-offs.</p></div>
+        <div class="panel panel-pad"><b class="mono">B · States → organs</b><p>Severities combine into ten health-state loads. Each state removes up to a fixed number of points from the organs it influences. Two linear layers keep every point traceable.</p></div>
+        <div class="panel panel-pad"><b class="mono">C · Recommendations</b><p>Active states retrieve candidate actions. In a real system every edge would need provenance, evidence grading, uncertainty, contraindication checks and clinical governance.</p></div>
+      </div>
+      <div class="notice" style="margin-top:18px"><strong>Limitations.</strong> Organ “scores” are not measurements of organ function. Real organ assessment needs imaging, specialised tests, history and clinical judgment. The model ignores age, sex, medications, genetics, conditions, and interactions beyond the simple additive structure above.</div>
+    </section>
+
+    <div class="disclaimer-bar"><div class="wrap"><strong>PORTFOLIO DEMONSTRATION — NOT A MEDICAL DEVICE</strong><span>Synthetic data and illustrative logic only. It does not diagnose disease, replace clinical judgment, or provide individualized medical treatment.</span></div></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap"><span>© 2026 Eman Koosehlar</span><span>Educational portfolio demonstration</span><a href="../../index.html#projects">Back to portfolio ↑</a></div>
+  </footer>
+  <script src="../../assets/js/config.js"></script>
+  <script src="../../assets/js/site.js"></script>
+  <script src="../../assets/js/kgraph.js"></script>
+  <script src="assets/health.js"></script>
+</body>
+</html>

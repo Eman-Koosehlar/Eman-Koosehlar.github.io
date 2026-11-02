@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Computational ADC Design — Eman Koosehlar</title>
+  <meta name="description" content="Illustrative portfolio use case: an interactive 3D antibody–drug-conjugate builder on public PDB structures (1HZH and deposited ligand coordinates). Not an original or proprietary project.">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="assets/adc.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.1/3Dmol-min.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#builder">Skip to the builder</a>
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="../../index.html" aria-label="Eman Koosehlar — home">Eman Koosehlar</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">☰</button>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="../../index.html#projects">← Portfolio</a>
+        <a href="../health-kg/index.html">Health KG</a>
+        <a href="../microbiome-recommendation/index.html">Microbiome</a>
+        <a href="../neoantigen-vaccine/index.html">mRNA vaccine</a>
+        <a href="../adc-design/index.html" aria-current="page">ADC design</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap pg-hero">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Project 04 · Molecular design · 3D visualization</div>
+        <h1>Computational ADC Design</h1>
+        <p class="lead">Build an antibody–drug-conjugate visualization step by step on a real crystal structure of a human IgG1 antibody (PDB 1HZH): choose a site, then grow the conjugate outward — a real sugar chain from the antibody’s own glycan, a real click-chemistry handle, a real PEG linker and a real payload, each from public deposited coordinates.</p>
+        <div class="tags"><span>PDB 1HZH</span><span>3Dmol.js</span><span>RCSB PDB</span><span>Interactive builder</span></div>
+      </div>
+      <div class="notice"><strong>Illustrative portfolio use case.</strong> This page is a demonstration built from <strong>public structures and non-confidential examples</strong>. It is <strong>not an original, proprietary or company project</strong>, reconstructs no confidential molecule, and makes no claim about efficacy, stability, drug-to-antibody ratio or any experimental result.</div>
+    </section>
+
+    <section id="builder" class="wrap">
+      <div class="presets-bar no-print"><span class="kicker">Example constructs</span><div id="presets" class="presets"></div></div>
+      <div class="layout">
+        <div class="sidebar" id="sidebar" aria-label="Builder steps"></div>
+
+        <div class="stage panel">
+          <div class="toolbar no-print">
+            <button class="btn small" id="surfaceBtn" type="button">Toggle surface</button>
+            <button class="btn small" id="viewBtn" type="button">Reset view</button>
+            <button class="btn small" id="spinBtn" type="button" aria-pressed="false">Spin</button>
+            <button class="btn small" id="resetBtn" type="button">Reset construct</button>
+          </div>
+          <div id="viewport" role="img" aria-label="3D view of an IgG1 antibody with the conjugate being built">
+            <div class="viewer-status" id="viewerStatus"><p>Loading real antibody structure (PDB 1HZH) from RCSB…</p></div>
+            <div class="busy" id="busy" hidden></div>
+          </div>
+          <div class="legend" id="legend"></div>
+          <div class="conjugate-panel">
+            <div class="cp-title">CONJUGATE COMPONENTS — public deposited structures</div>
+            <div class="cp-row" id="cpRow"></div>
+          </div>
+        </div>
+      </div>
+      <p class="fine center">Colors in the scene: <span style="color:#F2C744">■</span> attachment pin / click handle · <span style="color:#34D399">■</span> sugar chain · <span style="color:#9AA7B4">■</span> linker · <span style="color:#FB6B90">■</span> payload. Antibody chains: H blue, K teal, L/M violet.</p>
+    </section>
+
+    <section class="wrap sec">
+      <div class="section-head"><span>01</span><h2>Construct summary</h2></div>
+      <div class="panel panel-pad" id="summary" aria-live="polite"></div>
+    </section>
+
+    <section class="wrap sec">
+      <div class="section-head"><span>02</span><h2>Scientific notes &amp; limitations</h2></div>
+      <div class="notes">
+        <div class="panel panel-pad"><b class="mono">What is real</b><p>The antibody coordinates (1HZH), the native glycan residues, and each small-molecule geometry are deposited, publicly available crystal-structure data fetched from RCSB at runtime.</p></div>
+        <div class="panel panel-pad"><b class="mono">What is schematic</b><p>Components come from unrelated structures and are positioned along an axis from the chosen atom. The connecting cylinders are not covalent bonds, so the assembly is a conceptual visualization, not a chemically valid conjugate.</p></div>
+        <div class="panel panel-pad"><b class="mono">Engineered cysteine</b><p>S239C and A114C follow published THIOMAB-style positions. This structure carries the native residue there, so the site is shown for illustration, not as a resolved mutant.</p></div>
+        <div class="panel panel-pad"><b class="mono">Not modeled</b><p>Drug-to-antibody ratio, conjugation chemistry and kinetics, linker cleavage, payload release, aggregation, pharmacokinetics, and any biological activity. One heavy chain is decorated per site; the real antibody is symmetric.</p></div>
+      </div>
+    </section>
+
+    <section class="wrap sec">
+      <div class="section-head"><span>03</span><h2>Structural references &amp; attribution</h2></div>
+      <div class="panel panel-pad credit">
+        <p><b>Antibody:</b> <a href="https://www.rcsb.org/structure/1HZH" target="_blank" rel="noopener noreferrer">PDB 1HZH</a> — Saphire et al., <i>Science</i> 293:1155 (2001). Engineered-cysteine positions S239C / A114C follow Junutula et al., <i>Nat. Biotechnol.</i> 26:925 (2008) — this structure has the native residue there, shown for illustration rather than a resolved mutant.</p>
+        <p><b>Sugar chain:</b> the real N-glycan residues already resolved on this antibody’s own heavy chain (native to PDB 1HZH) — not a separately fetched structure.</p>
+        <p><b>Click handles:</b> azide — real azide-ion coordinates from <a href="https://www.rcsb.org/structure/1AZI" target="_blank" rel="noopener noreferrer">PDB 1AZI</a>, horse-heart azidometmyoglobin (Maurus et al., <i>Biochem. J.</i> 332:67, 1998). Alkyne — real coordinates of L-propargylglycine, a genuine terminal-alkyne amino acid, from <a href="https://www.rcsb.org/structure/1I29" target="_blank" rel="noopener noreferrer">PDB 1I29</a> (Mihara et al., <i>J. Biochem.</i> 131:679, 2002).</p>
+        <p><b>PEG linker:</b> real tetraethylene-glycol coordinates from <a href="https://www.rcsb.org/structure/2BLX" target="_blank" rel="noopener noreferrer">PDB 2BLX</a>, hen egg-white lysozyme (Nanao et al., <i>Acta Crystallogr. D</i> 61:1227, 2005) — standing in for a PEG-based linker.</p>
+        <p><b>Payloads:</b> real deposited ligand geometry from drug–tubulin crystal structures — MMAE from <a href="https://www.rcsb.org/structure/5IYZ" target="_blank" rel="noopener noreferrer">PDB 5IYZ</a> (Waight et al., <i>PLoS ONE</i> 2016); DM1 (as its L-DM1-SMe analog) from <a href="https://www.rcsb.org/structure/7E4Q" target="_blank" rel="noopener noreferrer">PDB 7E4Q</a> (Li et al., <i>BBRC</i> 2021).</p>
+        <p><b>Other public references from the earlier version of this project</b> (not used by the current builder; descriptions carried over as originally written and not re-verified): <a href="https://www.rcsb.org/structure/1IGT" target="_blank" rel="noopener noreferrer">1IGT</a> (intact IgG), <a href="https://www.rcsb.org/structure/9Z0F" target="_blank" rel="noopener noreferrer">9Z0F</a> (Fc linker–payload reference), <a href="https://www.rcsb.org/structure/4K3J" target="_blank" rel="noopener noreferrer">4K3J</a>.</p>
+        <p class="fine">Requires network access to cdnjs.cloudflare.com (3Dmol.js), files.rcsb.org and models.rcsb.org. The original standalone reference file is kept in <code>reference/</code> for provenance.</p>
+      </div>
+    </section>
+
+    <div class="disclaimer-bar"><div class="wrap"><strong>PORTFOLIO DEMONSTRATION — PUBLIC DATA ONLY</strong><span>Illustrative use case on public PDB structures. Not an original or proprietary project, not a validated design, and not for therapeutic or manufacturing decisions.</span></div></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap"><span>© 2026 Eman Koosehlar</span><span>Educational portfolio demonstration</span><a href="../../index.html#projects">Back to portfolio ↑</a></div>
+  </footer>
+  <script src="../../assets/js/config.js"></script>
+  <script src="../../assets/js/site.js"></script>
+  <script src="assets/adc.js"></script>
+</body>
+</html>

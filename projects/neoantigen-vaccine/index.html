@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personalized mRNA Vaccine Design — Eman Koosehlar</title>
+  <meta name="description" content="Conceptual, non-clinical demonstration of a neoantigen-to-mRNA vaccine design workflow using synthetic tumor profiles: variant filtering, HLA-aware ranking and multi-epitope construct visualization.">
+  <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="assets/vaccine.css">
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Skip to the demo</a>
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="../../index.html" aria-label="Eman Koosehlar — home">Eman Koosehlar</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">☰</button>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="../../index.html#projects">← Portfolio</a>
+        <a href="../health-kg/index.html">Health KG</a>
+        <a href="../microbiome-recommendation/index.html">Microbiome</a>
+        <a href="../neoantigen-vaccine/index.html" aria-current="page">mRNA vaccine</a>
+        <a href="../adc-design/index.html">ADC design</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap pg-hero">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> Project 03 · Immunogenomics · Neoantigen design</div>
+        <h1>Personalized mRNA Vaccine Design</h1>
+        <p class="lead">A conceptual walk-through of how a tumor’s somatic variants could be filtered, matched to a patient’s HLA type, ranked as neoantigen candidates and arranged into a multi-epitope mRNA construct — with every score component visible.</p>
+        <ol class="pipeline" aria-label="Workflow">
+          <li><b>01</b> Tumor variants</li><li><b>02</b> VAF / expression filter</li><li><b>03</b> HLA-aware ranking</li><li><b>04</b> Peptide inspection</li><li><b>05</b> Construct concept</li>
+        </ol>
+      </div>
+      <div class="notice"><strong>Conceptual demo — not a clinical or design tool.</strong> Patients, VAF, TPM, peptides and scores are <strong>synthetic</strong>. No HLA binding predictor, immunogenicity data, safety analysis or manufacturing design is used, and nothing here has been experimentally validated. Do not use it for any patient or product decision.</div>
+    </section>
+
+    <section id="workspace" class="wrap">
+      <div class="vx-grid">
+        <aside class="panel vx-controls">
+          <div class="vx-eyebrow">01 · SYNTHETIC PATIENT</div>
+          <div class="vx-profiles" role="group" aria-label="Synthetic patient profile">
+            <button class="vx-profile-btn" data-profile="melanoma" type="button" aria-pressed="true">Melanoma</button>
+            <button class="vx-profile-btn" data-profile="lung" type="button" aria-pressed="false">Lung</button>
+            <button class="vx-profile-btn" data-profile="colorectal" type="button" aria-pressed="false">Colorectal</button>
+          </div>
+          <p id="profileInfo" class="vx-info"></p>
+
+          <div class="vx-eyebrow">02 · HLA ALLELE</div>
+          <label class="sr-only" for="hla">HLA allele</label>
+          <select id="hla">
+            <option>HLA-A*02:01</option><option>HLA-A*11:01</option><option>HLA-A*24:02</option><option>HLA-B*07:02</option>
+          </select>
+          <p class="vx-fine">Changing the allele changes the synthetic presentation proxy and the anchor-motif hints shown for each peptide.</p>
+
+          <div class="vx-eyebrow">03 · FILTERS</div>
+          <div class="vx-range"><label for="vaf">Minimum VAF</label><b id="vafText">0.20</b></div>
+          <input id="vaf" type="range" min="0.05" max="0.60" step="0.01" value="0.20">
+          <div class="vx-range"><label for="tpm">Minimum expression (TPM)</label><b id="tpmText">1</b></div>
+          <input id="tpm" type="range" min="0" max="20" step="1" value="1">
+          <label class="vx-check"><input id="expressed" type="checkbox" checked> Require expression evidence (TPM ≥ threshold)</label>
+          <label class="vx-check"><input id="coding" type="checkbox" checked> Neoantigen-eligible consequences only (missense / frameshift)</label>
+          <button id="runBtn" class="vx-run" type="button">Re-run analysis</button>
+          <p class="vx-fine">Results also update live as you move any control.</p>
+        </aside>
+
+        <div class="vx-main">
+          <div class="panel vx-card">
+            <div class="vx-head"><div><div class="vx-eyebrow">04 · VARIANT LANDSCAPE</div><h3>Prioritization funnel</h3></div><span id="variantCount" class="vx-count"></span></div>
+            <div id="variantSummary" class="vx-stats"></div>
+            <div class="table-scroll"><table class="vx-table"><thead><tr><th>Gene</th><th>Variant</th><th>VAF</th><th>Expression</th><th>Status</th></tr></thead><tbody id="variantTable"></tbody></table></div>
+            <p class="vx-fine">Stop-gained variants are flagged ineligible because truncated transcripts are generally degraded by nonsense-mediated decay; regulatory variants change expression, not protein sequence.</p>
+          </div>
+
+          <div class="vx-two">
+            <div class="panel vx-card">
+              <div class="vx-head"><div><div class="vx-eyebrow">05 · CANDIDATE RANKING</div><h3>Neoantigen candidates</h3></div><span id="candidateCount" class="vx-count"></span></div>
+              <div id="candidateList" class="vx-candidates"></div>
+            </div>
+            <div id="inspector" class="panel vx-card">
+              <div class="vx-head"><div><div class="vx-eyebrow">06 · INSPECTOR</div><h3 id="candidateName">Candidate inspector</h3></div><span id="candidateScore" class="vx-count">Select one</span></div>
+              <div id="candidateContent"></div>
+            </div>
+          </div>
+
+          <div class="panel vx-card">
+            <div class="vx-head"><div><div class="vx-eyebrow">07 · mRNA CONSTRUCT CONCEPT</div><h3>Multi-epitope design</h3></div><span id="selectionText" class="vx-count">0 / 3 selected</span></div>
+            <div class="vx-mrna" aria-label="Schematic of a conceptual mRNA construct">
+              <div class="blk cap" title="5′ cap">5′ CAP</div><div class="blk utr" title="5′ untranslated region">5′ UTR</div><div class="blk sig" title="Signal peptide (conceptual)">SIGNAL</div>
+              <div class="slot" data-slot="0"></div><div class="blk lnk">AAY</div><div class="slot" data-slot="1"></div><div class="blk lnk">AAY</div><div class="slot" data-slot="2"></div>
+              <div class="blk utr" title="3′ untranslated region">3′ UTR</div><div class="blk pa" title="Poly(A) tail">poly(A)</div>
+            </div>
+            <div id="selectionCards" class="vx-chips"></div>
+            <div class="vx-actions"><button id="clear" class="vx-clear" type="button">Clear construct</button></div>
+            <div id="report" class="vx-report" style="display:none" aria-live="polite"></div>
+          </div>
+
+          <div class="panel vx-card">
+            <div class="vx-eyebrow">08 · SCIENTIFIC NOTES</div>
+            <div class="vx-notes">
+              <div><b>What a real pipeline adds</b><p>Somatic variant calling and annotation (e.g. VEP), clonality and purity estimation, allele-specific expression, HLA typing, peptide processing and binding prediction (e.g. NetMHCpan, MHCflurry via pVACtools), self-similarity checks, and expert review.</p></div>
+              <div><b>Why VAF and TPM?</b><p>Higher VAF suggests a variant is present in more tumor cells (more clonal); expression evidence suggests the mutant transcript could actually be translated and presented.</p></div>
+              <div><b>Why HLA matters</b><p>Each HLA allele presents peptides with particular anchor residues (usually positions 2 and 9 for 9-mers), so the same variant can be a good candidate for one patient and irrelevant for another.</p></div>
+              <div><b>Why a conceptual construct?</b><p>Real designs need codon and UTR optimization, nucleoside modification choices, delivery formulation, and extensive safety and immunogenicity testing — none of which is attempted here.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="disclaimer-bar"><div class="wrap"><strong>PORTFOLIO DEMONSTRATION — NOT FOR CLINICAL USE</strong><span>Synthetic data and illustrative scoring only. No experimental validation is claimed; peptide strings are illustrative contexts, not verified protein sequences.</span></div></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap"><span>© 2026 Eman Koosehlar</span><span>Educational portfolio demonstration</span><a href="../../index.html#projects">Back to portfolio ↑</a></div>
+  </footer>
+  <script src="../../assets/js/config.js"></script>
+  <script src="../../assets/js/site.js"></script>
+  <script src="assets/vaccine.js"></script>
+</body>
+</html>

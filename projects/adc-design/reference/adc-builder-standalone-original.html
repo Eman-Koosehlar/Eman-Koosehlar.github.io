@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ADC Builder — Real Molecular Structure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.1/3Dmol-min.js"></script>
+<style>
+  :root{
+    --ink:#0B0F14; --panel:#12181F; --panel-2:#171F28;
+    --line: rgba(231,236,242,0.09); --line-strong: rgba(231,236,242,0.16);
+    --text:#E7ECF2; --text-dim:#8B96A5; --text-faint:#5B6673;
+    --accent:#F2C744; --accent-dim: rgba(242,199,68,0.35);
+    --sugar:#34D399; --payload:#FB6B90; --radius-sm:3px; --radius-md:6px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--ink); color:var(--text); font-family:'Inter',-apple-system,sans-serif; -webkit-font-smoothing:antialiased; }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0; font-weight:600;}
+  .wrap{ max-width:1400px; margin:0 auto; padding:36px 28px 60px; }
+
+  header.top{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; padding-bottom:22px; border-bottom:1px solid var(--line); margin-bottom:26px; flex-wrap:wrap; }
+  header.top .title-block h1{ font-size:26px; letter-spacing:-0.01em; }
+  header.top .title-block p{ margin:8px 0 0; color:var(--text-dim); font-size:14px; max-width:64ch; line-height:1.55; }
+  .top-actions{ display:flex; gap:10px; flex-shrink:0; }
+  button.pill{ font-family:'Inter',sans-serif; font-size:13px; font-weight:500; color:var(--text); background:var(--panel); border:1px solid var(--line-strong); padding:9px 16px; border-radius:999px; cursor:pointer; transition:border-color .18s ease, background .18s ease; }
+  button.pill:hover{ border-color:var(--accent-dim); background:var(--panel-2); }
+  button.pill:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .layout{ display:grid; grid-template-columns:340px 1fr; gap:22px; align-items:start; }
+  @media (max-width:920px){ .layout{ grid-template-columns:1fr; } }
+
+  .sidebar{ display:flex; flex-direction:column; gap:9px; max-height:900px; overflow-y:auto; padding-right:4px; }
+  .step{ border:1px solid var(--line); background:var(--panel); border-radius:var(--radius-md); padding:13px 15px; transition:opacity .2s ease, border-color .2s ease; }
+  .step.locked{ opacity:.4; pointer-events:none; }
+  .step.done{ border-color:var(--line-strong); }
+  .step-head{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:4px; }
+  .step-num{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); }
+  .step-title{ font-size:13.5px; font-weight:600; font-family:'Space Grotesk',sans-serif; }
+  .step-sub{ font-size:11.5px; color:var(--text-dim); margin:2px 0 9px; line-height:1.5; }
+  .chip-row{ display:flex; flex-direction:column; gap:6px; }
+  .chip{ text-align:left; width:100%; background:transparent; border:1px solid var(--line); color:var(--text); padding:7px 9px; border-radius:var(--radius-sm); cursor:pointer; font-size:12px; line-height:1.4; transition:border-color .15s ease, background .15s ease; font-family:'Inter',sans-serif; }
+  .chip:hover{ border-color:var(--accent-dim); background:rgba(242,199,68,0.05); }
+  .chip:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .chip .chip-name{ display:block; font-weight:600; }
+  .chip .chip-note{ display:block; color:var(--text-dim); font-size:11px; margin-top:2px; }
+  .chip.selected{ border-color:var(--accent); background:rgba(242,199,68,0.09); }
+  .chip.selected .chip-name{ color:var(--accent); }
+  .chip.caveat .chip-note{ color:#E0A93A; }
+
+  .stage{ background:#05070A; border:1px solid var(--line); border-radius:var(--radius-md); overflow:hidden; display:flex; flex-direction:column; }
+  #viewport{ width:100%; height:560px; position:relative; }
+  .viewer-status{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text-faint); font-family:'JetBrains Mono',monospace; font-size:12.5px; background:#05070A; pointer-events:none; text-align:center; padding:20px; line-height:1.6; z-index:5; }
+  .viewer-status.hidden{ display:none; }
+
+  .legend{ border-top:1px solid var(--line); padding:14px 20px; display:flex; flex-wrap:wrap; gap:8px 20px; align-items:center; font-size:12px; color:var(--text-dim); min-height:24px; }
+  .legend .name{ margin-left:auto; font-family:'JetBrains Mono',monospace; color:var(--accent); font-size:13px; }
+
+  .conjugate-panel{ border-top:1px solid var(--line); padding:16px 20px 20px; }
+  .conjugate-panel .cp-title{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); margin-bottom:10px; letter-spacing:.02em; }
+  .cp-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .cp-card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-md); padding:10px; width:140px; text-align:center; }
+  .cp-card .cp-icon3d{ width:110px; height:110px; margin:0 auto 8px; border-radius:3px; background:linear-gradient(135deg,#171F28,#1B222C); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--accent); text-align:center; padding:6px; }
+  .cp-card .cp-name{ font-size:12px; font-weight:600; }
+  .cp-card .cp-cid{ font-size:10px; color:var(--text-faint); font-family:'JetBrains Mono',monospace; margin-top:2px; }
+  .cp-empty{ color:var(--text-faint); font-size:12px; font-family:'JetBrains Mono',monospace; }
+
+  .credit{ margin-top:14px; color:var(--text-faint); font-size:11px; font-family:'JetBrains Mono',monospace; line-height:1.7; text-align:center; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition-duration:1ms !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="title-block">
+      <h1>ADC Builder</h1>
+      <p>A real crystal structure of a human IgG1 antibody (PDB 1HZH). Pick an engineered-cysteine site, then grow the conjugate outward — a real sugar chain lifted from this antibody's own resolved glycan, a real click-chemistry handle, a real PEG linker, and a real payload, each embedded as true 3D coordinates from an actual deposited structure.</p>
+    </div>
+    <div class="top-actions">
+      <button class="pill" id="surfaceBtn">Toggle surface</button>
+      <button class="pill" id="resetBtn">Reset</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="sidebar" id="sidebar"></div>
+
+    <div class="stage">
+      <div id="viewport">
+        <div class="viewer-status" id="viewerStatus">Loading real antibody structure (PDB 1HZH) from RCSB…</div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="conjugate-panel">
+        <div class="cp-title">CONJUGATE COMPONENTS — real structures</div>
+        <div class="cp-row" id="cpRow"><span class="cp-empty">Choose a site to begin.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="credit">
+    Antibody: PDB 1HZH — Saphire et al., <i>Science</i> 293:1155 (2001). Engineered-cysteine positions S239C / A114C follow Junutula et al., <i>Nat. Biotechnol.</i> 26:925 (2008) — this structure has the native residue there, shown for illustration rather than a resolved mutant.<br>
+    Sugar chain: the real N-glycan residues already resolved on this antibody's own heavy chain (native to PDB 1HZH) — not a separately fetched structure.<br>
+    Azide: real azide-ion coordinates from PDB 1AZI, horse-heart azidometmyoglobin (Maurus et al., <i>Biochem. J.</i> 332:67, 1998). Alkyne: real coordinates of L-propargylglycine, a genuine terminal-alkyne amino acid, from PDB 1I29 (Mihara et al., <i>J. Biochem.</i> 131:679, 2002).<br>
+    PEG linker: real tetraethylene-glycol coordinates from PDB 2BLX, hen egg-white lysozyme (Nanao et al., <i>Acta Crystallogr. D</i> 61:1227, 2005) — standing in for a PEG-based linker.<br>
+    Payload 3D coordinates are real deposited ligand geometry from drug–tubulin crystal structures: MMAE from PDB 5IYZ (Waight et al., <i>PLoS ONE</i> 2016), DM1 (as its L-DM1-SMe analog) from PDB 7E4Q (Li et al., <i>BBRC</i> 2021).<br>
+    One heavy chain (H) is shown per site for clarity; the real structure is symmetric. Requires network access to files.rcsb.org and models.rcsb.org.
+  </div>
+</div>
+
+<script>
+(function(){
+
+  /* ---------------- Real reference data ---------------- */
+
+  const CHEMISTRIES = [
+    { id:'thiomab', name:'Engineered cysteine', caveat:true, note:'Site-specific THIOMAB-style engineering. This structure has the native residue here — position shown for illustration, not a resolved mutant.',
+      siteOptions:[
+        { id:'s239c', label:'S239C (heavy chain)', chain:'H', resi:239, atom:'CB' },
+        { id:'a114c', label:'A114C (heavy chain)', chain:'H', resi:114, atom:'CB' },
+      ]},
+  ];
+
+  const SUGARS = [
+    { id:'none',   name:'No sugar chain', note:'Skip directly to the click handle / linker.' },
+    { id:'native', name:'Native N-glycan chain', note:"This antibody's own real, resolved sugar residues, taken straight from the loaded structure." },
+  ];
+
+  const CLICK_HANDLES = [
+    { id:'none',   name:'No click handle', note:'Skip directly to the linker.' },
+    { id:'azide',  name:'Azide', note:'Real azide-ion coordinates from PDB 1AZI (bound in horse-heart myoglobin).',
+      sdfUrl:'https://models.rcsb.org/v1/1azi/ligand?auth_seq_id=300&label_asym_id=C&encoding=sdf&filename=1azi_C_AZI.sdf', sourcePdb:'1AZI' },
+    { id:'alkyne', name:'Alkyne', note:'Real coordinates of L-propargylglycine, a genuine terminal-alkyne compound, from PDB 1I29.',
+      sdfUrl:'https://models.rcsb.org/v1/1i29/ligand?auth_seq_id=460&label_asym_id=B&encoding=sdf&filename=1i29_B_LPG.sdf', sourcePdb:'1I29' },
+  ];
+
+  const LINKERS = [
+    { id:'pegchain', name:'PEG chain', abbr:'PEG', note:'Real tetraethylene-glycol coordinates from PDB 2BLX, standing in for a PEG-based linker.',
+      sdfUrl:'https://models.rcsb.org/v1/2blx/ligand?auth_seq_id=1131&label_asym_id=C&encoding=sdf&filename=2blx_C_PG4.sdf', sourcePdb:'2BLX' },
+  ];
+
+  const PAYLOADS = [
+    { id:'mmae', name:'MMAE', abbr:'MMAE', note:'Monomethyl auristatin E — real coordinates from its tubulin-bound structure (PDB 5IYZ).',
+      sdfUrl:'https://models.rcsb.org/v1/5iyz/ligand?auth_seq_id=503&label_asym_id=S&encoding=sdf&filename=5iyz_S_4Q5.sdf', sourcePdb:'5IYZ' },
+    { id:'dm1', name:'DM1 (mertansine)', abbr:'DM1', note:'Maytansinoid — shown using the real coordinates of its L-DM1-SMe crystallization analog (PDB 7E4Q).',
+      sdfUrl:'https://models.rcsb.org/v1/7e4q/ligand?auth_seq_id=503&label_asym_id=R&encoding=sdf&filename=7e4q_R_BKX.sdf', sourcePdb:'7E4Q' },
+  ];
+
+  const ORDER = ['chemistry','site','sugar','click','linker','payload'];
+  const STEP_META = {
+    chemistry: { title:'Attachment chemistry', sub:'Engineered-cysteine conjugation on this structure.' },
+    site:      { title:'Site', sub:'One real atom on chain H — the structure is symmetric.' },
+    sugar:     { title:'Sugar chain', sub:"This antibody's own real glycan residues." },
+    click:     { title:'Click handle', sub:'Bioorthogonal handle for downstream conjugation.' },
+    linker:    { title:'Linker', sub:'Spacer between handle and payload.' },
+    payload:   { title:'Cytotoxic payload', sub:'Real 3D coordinates from a drug-target structure.' },
+  };
+  const SUGAR_RESN = ['NAG','BMA','MAN','GAL','FUC','SIA'];
+  const CPK = { C:'#909090', N:'#3050F8', O:'#FF0D0D', S:'#FFD400', CL:'#1FF01F', F:'#90E050', P:'#FF8000' };
+
+  const LOOKUP = { chemistry:CHEMISTRIES, sugar:SUGARS, click:CLICK_HANDLES, linker:LINKERS, payload:PAYLOADS };
+
+  let state = { chemistry:null, site:null, sugar:null, click:null, linker:null, payload:null };
+  let viewer = null, antibodyModel = null, proteinCentroid = null, surfaceOn = true, surfaceId = null;
+  const textCache = new Map();
+  let addedModels = []; // small-molecule GLModels added for the current assembly
+
+  /* ---------------- Viewer setup ---------------- */
+
+  function initViewer(){
+    const el = document.getElementById('viewport');
+    try{
+      viewer = $3Dmol.createViewer(el, { backgroundColor:'#05070A' });
+    }catch(e){
+      setStatus('This viewer needs WebGL, which is not available in this browser.');
+      return;
+    }
+    loadAntibody();
+  }
+
+  function setStatus(msg){
+    const s = document.getElementById('viewerStatus');
+    if(msg===null){ s.classList.add('hidden'); return; }
+    s.classList.remove('hidden');
+    s.textContent = msg;
+  }
+
+  async function loadAntibody(){
+    try{
+      const res = await fetch('https://files.rcsb.org/download/1HZH.pdb');
+      if(!res.ok) throw new Error('RCSB fetch failed: '+res.status);
+      const pdbText = await res.text();
+      antibodyModel = viewer.addModel(pdbText, 'pdb');
+
+      viewer.setStyle({}, {});
+      viewer.setStyle({hetflag:false}, { cartoon:{ colorfunc: chainColor } });
+      viewer.setStyle({hetflag:true, resn: SUGAR_RESN}, { stick:{ radius:0.18, colorscheme:'greenCarbon' } });
+
+      addProteinSurface();
+
+      const caAtoms = antibodyModel.selectedAtoms({hetflag:false, atom:'CA'});
+      proteinCentroid = centroidOf(caAtoms);
+
+      viewer.zoomTo();
+      viewer.render();
+      setStatus(null);
+      renderSidebar();
+    }catch(err){
+      console.error(err);
+      setStatus('Could not load the antibody structure from RCSB (files.rcsb.org). This usually means the page has no network access, or the host is blocking cross-origin requests. Check your network settings and reload.');
+    }
+  }
+
+  function chainColor(atom){
+    switch(atom.chain){
+      case 'H': return '#38BDF8';
+      case 'K': return '#2DD4BF';
+      case 'L': return '#A78BFA';
+      case 'M': return '#C4B5FD';
+      default:  return '#94A3B8';
+    }
+  }
+
+  function addProteinSurface(){
+    if(surfaceId!==null){ viewer.removeSurface(surfaceId); surfaceId=null; }
+    if(!surfaceOn) return;
+    viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity:0.4, color:'#3AA9D6' }, {hetflag:false}, {}, (id)=>{ surfaceId=id; });
+  }
+
+  function centroidOf(atoms){
+    if(!atoms.length) return {x:0,y:0,z:0};
+    let x=0,y=0,z=0;
+    atoms.forEach(a=>{x+=a.x;y+=a.y;z+=a.z;});
+    return { x:x/atoms.length, y:y/atoms.length, z:z/atoms.length };
+  }
+
+  function outwardDir(pos, centroid){
+    const dx=pos.x-centroid.x, dy=pos.y-centroid.y, dz=pos.z-centroid.z;
+    const len = Math.hypot(dx,dy,dz) || 1;
+    return { x:dx/len, y:dy/len, z:dz/len };
+  }
+
+  function advancePoint(p, dir, d){
+    return { x:p.x+dir.x*d, y:p.y+dir.y*d, z:p.z+dir.z*d };
+  }
+
+  function getSiteAtom(site){
+    const atoms = antibodyModel.selectedAtoms({ chain:site.chain, resi:site.resi, atom:site.atom });
+    return atoms.length ? atoms[0] : null;
+  }
+
+  // Groups this antibody's own resolved glycan HETATMs (chain A or B) into
+  // individual monosaccharide residues, in deposition order — real atoms,
+  // no additional network fetch required.
+  function getNativeGlycanResidues(){
+    for(const authChain of ['A','B']){
+      const atoms = antibodyModel.selectedAtoms({ chain:authChain, hetflag:true });
+      const filtered = atoms.filter(a=>SUGAR_RESN.includes(a.resn));
+      if(!filtered.length) continue;
+      const byResi = new Map();
+      filtered.forEach(a=>{ if(!byResi.has(a.resi)) byResi.set(a.resi, []); byResi.get(a.resi).push(a); });
+      const resis = Array.from(byResi.keys()).sort((x,y)=>x-y);
+      return resis.map(r=>({ resi:r, resn: byResi.get(r)[0].resn, atoms: byResi.get(r) }));
+    }
+    return [];
+  }
+
+  /* ---------------- Generic real-structure embedding ---------------- */
+
+  async function fetchAndCache(url){
+    if(textCache.has(url)) return textCache.get(url);
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('fetch failed ('+res.status+'): '+url);
+    const text = await res.text();
+    textCache.set(url, text);
+    return text;
+  }
+
+  async function embedFromText(text, format, targetCenter){
+    let m;
+    try{ m = viewer.addModel(text, format); }
+    catch(e){ console.error(e); return null; }
+    const atoms = m.selectedAtoms({});
+    if(!atoms.length){ try{ viewer.removeModel(m); }catch(e){} return null; }
+    const centroid = centroidOf(atoms);
+    const dx = targetCenter.x-centroid.x, dy = targetCenter.y-centroid.y, dz = targetCenter.z-centroid.z;
+    atoms.forEach(a=>{ a.x+=dx; a.y+=dy; a.z+=dz; });
+    m.setStyle({}, { stick:{ radius:0.15, colorscheme:'default' }, sphere:{ scale:0.22, colorscheme:'default' } });
+    addedModels.push(m);
+    return atoms;
+  }
+
+  async function embedInstanceSDF(url, targetCenter){
+    try{
+      const text = await fetchAndCache(url);
+      return await embedFromText(text, 'sdf', targetCenter);
+    }catch(e){ console.error(e); return null; }
+  }
+
+  // Builds a minimal V2000 SDF from a real set of atoms (e.g. one residue
+  // lifted from the already-loaded antibody model), inferring bonds by
+  // distance. Used for the native-glycan sugar chain — no fetch involved.
+  function residueAtomsToSDF(atoms){
+    const bonds = [];
+    for(let i=0;i<atoms.length;i++){
+      for(let j=i+1;j<atoms.length;j++){
+        const d = Math.hypot(atoms[i].x-atoms[j].x, atoms[i].y-atoms[j].y, atoms[i].z-atoms[j].z);
+        if(d < 1.9) bonds.push([i+1, j+1]);
+      }
+    }
+    const lines = [];
+    lines.push('residue'); lines.push(''); lines.push('');
+    lines.push(String(atoms.length).padStart(3,' ') + String(bonds.length).padStart(3,' ') + '  0  0  0  0  0  0  0  0999 V2000');
+    atoms.forEach(a=>{
+      const el = (a.elem || a.el || 'C').trim() || 'C';
+      lines.push(
+        a.x.toFixed(4).padStart(10,' ') +
+        a.y.toFixed(4).padStart(10,' ') +
+        a.z.toFixed(4).padStart(10,' ') + ' ' +
+        el.padEnd(3,' ') + ' 0  0  0  0  0  0  0  0  0  0  0  0'
+      );
+    });
+    bonds.forEach(b=>{
+      lines.push(String(b[0]).padStart(3,' ') + String(b[1]).padStart(3,' ') + '  1  0  0  0  0');
+    });
+    lines.push('M  END');
+    return lines.join('\n');
+  }
+
+  async function embedNativeResidue(residue, targetCenter){
+    try{
+      const sdfText = residueAtomsToSDF(residue.atoms);
+      return await embedFromText(sdfText, 'sdf', targetCenter);
+    }catch(e){ console.error(e); return null; }
+  }
+
+  function clearAddedModels(){
+    addedModels.forEach(m=>{ try{ viewer.removeModel(m); }catch(e){} });
+    addedModels = [];
+  }
+
+  /* ---------------- Visible pin + generic bond/label helpers ---------------- */
+
+  function drawPin(pos, dir){
+    const len = 9;
+    const tip = advancePoint(pos, dir, len);
+    viewer.addCylinder({ start:pos, end:tip, radius:0.3, color:'#F2C744', opacity:0.95, fromCap:true, toCap:true });
+    viewer.addSphere({ center:pos, radius:0.55, color:'#F2C744', opacity:0.9 });
+    return tip;
+  }
+
+  function addBond(p1, p2, color){
+    viewer.addCylinder({ start:p1, end:p2, radius:0.09, color, opacity:0.85 });
+  }
+
+  function addMarker(pos, color){
+    viewer.addSphere({ center:pos, radius:0.5, color, opacity:0.85 });
+  }
+
+  function addLabel(pos, text, color){
+    viewer.addLabel(text, {
+      position: pos, backgroundColor:'#12181F', backgroundOpacity:0.88,
+      fontColor: color||'#E7ECF2', fontSize:11.5, borderRadius:3, inFront:true, showBackground:true,
+      alignment:'bottomCenter',
+    });
+  }
+
+  /* ---------------- Chain assembly ---------------- */
+
+  async function buildChain(startPos, dir){
+    let cursor = { x:startPos.x, y:startPos.y, z:startPos.z };
+    let prevPoint = startPos;
+
+    if(state.sugar === 'native'){
+      const residues = getNativeGlycanResidues().slice(0,4);
+      if(!residues.length){
+        cursor = advancePoint(cursor, dir, 4.5);
+        addMarker(cursor, '#34D399'); addBond(prevPoint, cursor, '#34D399');
+        addLabel(cursor, 'no resolved glycan on this chain', '#E0A93A');
+        prevPoint = cursor;
+      } else {
+        for(const res of residues){
+          cursor = advancePoint(cursor, dir, 4.5);
+          const atoms = await embedNativeResidue(res, cursor);
+          if(atoms){ addBond(prevPoint, cursor, '#34D399'); }
+          else { addMarker(cursor, '#34D399'); addBond(prevPoint, cursor, '#34D399'); addLabel(cursor, res.resn+' (unavailable)', '#E0A93A'); }
+          prevPoint = cursor;
+        }
+      }
+    }
+
+    if(state.click && state.click!=='none'){
+      const def = CLICK_HANDLES.find(c=>c.id===state.click);
+      cursor = advancePoint(cursor, dir, 4.5);
+      const atoms = await embedInstanceSDF(def.sdfUrl, cursor);
+      if(atoms){ addBond(prevPoint, cursor, '#F2C744'); }
+      else { addMarker(cursor, '#F2C744'); addBond(prevPoint, cursor, '#F2C744'); addLabel(cursor, def.name+' (unavailable)', '#E0A93A'); }
+      prevPoint = cursor;
+    }
+
+    if(state.linker){
+      const def = LINKERS.find(l=>l.id===state.linker);
+      cursor = advancePoint(cursor, dir, 5.5);
+      const atoms = await embedInstanceSDF(def.sdfUrl, cursor);
+      if(atoms){ addBond(prevPoint, cursor, '#9AA7B4'); }
+      else { addMarker(cursor, '#9AA7B4'); addBond(prevPoint, cursor, '#9AA7B4'); addLabel(cursor, def.name+' (unavailable)', '#E0A93A'); }
+      prevPoint = cursor;
+    }
+
+    if(state.payload){
+      const def = PAYLOADS.find(p=>p.id===state.payload);
+      cursor = advancePoint(cursor, dir, 6);
+      const atoms = await embedInstanceSDF(def.sdfUrl, cursor);
+      if(atoms){ addBond(prevPoint, cursor, '#FB6B90'); addLabel(cursor, `${def.name} (${def.sourcePdb})`); }
+      else { addMarker(cursor, '#FB6B90'); addBond(prevPoint, cursor, '#FB6B90'); addLabel(cursor, def.name+' (unavailable)', '#E0A93A'); }
+    }
+  }
+
+  /* ---------------- State + redraw ---------------- */
+
+  function resetDownstream(fromKey){
+    const idx = ORDER.indexOf(fromKey);
+    ORDER.slice(idx+1).forEach(k=> state[k]=null);
+  }
+
+  function selectOption(step, value){
+    state[step] = value;
+    resetDownstream(step);
+    renderSidebar();
+    redraw();
+    renderLegend();
+    renderConjugatePanel();
+  }
+
+  function resetAll(){
+    state = { chemistry:null, site:null, sugar:null, click:null, linker:null, payload:null };
+    renderSidebar();
+    redraw();
+    renderLegend();
+    renderConjugatePanel();
+  }
+
+  async function redraw(){
+    if(!antibodyModel) return;
+    clearAddedModels();
+    viewer.removeAllShapes();
+    viewer.removeAllLabels();
+
+    if(state.chemistry && state.site){
+      const chem = CHEMISTRIES.find(c=>c.id===state.chemistry);
+      const site = chem.siteOptions.find(s=>s.id===state.site);
+      const atom = getSiteAtom(site);
+      if(atom){
+        const pos = {x:atom.x,y:atom.y,z:atom.z};
+        const dir = outwardDir(pos, proteinCentroid);
+        const pinTip = drawPin(pos, dir);
+        viewer.render();
+        await buildChain(pinTip, dir);
+      }
+    }
+    viewer.render();
+  }
+
+  /* ---------------- Sidebar UI ---------------- */
+
+  const sidebarEl = document.getElementById('sidebar');
+
+  function optionsFor(key){
+    if(key==='site') return state.chemistry ? CHEMISTRIES.find(c=>c.id===state.chemistry).siteOptions : [];
+    return LOOKUP[key] || [];
+  }
+
+  function renderSidebar(){
+    sidebarEl.innerHTML = '';
+    ORDER.forEach((key, idx)=>{
+      const unlocked = idx===0 || (state[ORDER[idx-1]]!==null && state[ORDER[idx-1]]!==undefined);
+      const done = state[key]!==null && state[key]!==undefined;
+      const meta = STEP_META[key];
+
+      const stepEl = document.createElement('div');
+      stepEl.className = 'step' + (unlocked?'':' locked') + (done?' done':'');
+
+      const head = document.createElement('div');
+      head.className = 'step-head';
+      head.innerHTML = `<span class="step-num mono">0${idx+1}</span><span class="step-title">${meta.title}</span>`;
+      stepEl.appendChild(head);
+
+      const sub = document.createElement('div');
+      sub.className = 'step-sub';
+      sub.textContent = meta.sub;
+      stepEl.appendChild(sub);
+
+      const row = document.createElement('div');
+      row.className = 'chip-row';
+
+      optionsFor(key).forEach(opt=>{
+        const isSel = state[key]===opt.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip' + (isSel?' selected':'') + (opt.caveat?' caveat':'');
+        const label = opt.name || opt.label;
+        let note = opt.note || '';
+        if(key==='site'){ note = `Real atom: chain ${opt.chain}, residue ${opt.resi} (${opt.atom})`; }
+        btn.innerHTML = `<span class="chip-name">${label}</span><span class="chip-note">${note}</span>`;
+        btn.addEventListener('click', ()=> selectOption(key, opt.id));
+        row.appendChild(btn);
+      });
+
+      stepEl.appendChild(row);
+      sidebarEl.appendChild(stepEl);
+    });
+  }
+
+  /* ---------------- Legend ---------------- */
+
+  const legendEl = document.getElementById('legend');
+
+  function renderLegend(){
+    legendEl.innerHTML = '';
+    const parts = [];
+    if(state.chemistry){
+      const chem = CHEMISTRIES.find(c=>c.id===state.chemistry);
+      const site = state.site ? chem.siteOptions.find(s=>s.id===state.site) : null;
+      parts.push(chem.name + (site ? ' — '+site.label : ''));
+    }
+    if(state.sugar && state.sugar!=='none') parts.push(SUGARS.find(s=>s.id===state.sugar).name);
+    if(state.click && state.click!=='none') parts.push(CLICK_HANDLES.find(c=>c.id===state.click).name);
+    if(state.linker) parts.push(LINKERS.find(l=>l.id===state.linker).name);
+    if(state.payload) parts.push(PAYLOADS.find(p=>p.id===state.payload).name);
+
+    if(parts.length===0){
+      legendEl.innerHTML = '<span>Choose a site to begin.</span>';
+      return;
+    }
+    parts.forEach(t=>{
+      const s = document.createElement('span');
+      s.textContent = t;
+      legendEl.appendChild(s);
+    });
+    if(state.linker && state.payload){
+      const linker = LINKERS.find(l=>l.id===state.linker);
+      const payload = PAYLOADS.find(p=>p.id===state.payload);
+      const nameEl = document.createElement('span');
+      nameEl.className = 'name mono';
+      nameEl.textContent = `IgG1-${linker.abbr}-${payload.abbr}`;
+      legendEl.appendChild(nameEl);
+    }
+  }
+
+  /* ---------------- Conjugate components panel ---------------- */
+
+  const cpRowEl = document.getElementById('cpRow');
+
+  function cp3DCard(name, tag){
+    const div = document.createElement('div');
+    div.className = 'cp-card';
+    div.innerHTML = `
+      <div class="cp-icon3d">real 3D<br>in viewer</div>
+      <div class="cp-name">${name}</div>
+      <div class="cp-cid">${tag}</div>
+    `;
+    return div;
+  }
+
+  function renderConjugatePanel(){
+    cpRowEl.innerHTML = '';
+    const cards = [];
+
+    if(state.sugar === 'native'){
+      cards.push(cp3DCard('Native N-glycan', 'from PDB 1HZH'));
+    }
+    if(state.click && state.click!=='none'){
+      const def = CLICK_HANDLES.find(c=>c.id===state.click);
+      cards.push(cp3DCard(def.name, 'PDB '+def.sourcePdb));
+    }
+    if(state.linker){
+      const def = LINKERS.find(l=>l.id===state.linker);
+      cards.push(cp3DCard(def.name, 'PDB '+def.sourcePdb));
+    }
+    if(state.payload){
+      const def = PAYLOADS.find(p=>p.id===state.payload);
+      cards.push(cp3DCard(def.name, 'PDB '+def.sourcePdb));
+    }
+
+    if(cards.length===0){
+      cpRowEl.innerHTML = '<span class="cp-empty">Choose a site to begin.</span>';
+      return;
+    }
+    cards.forEach(c=>cpRowEl.appendChild(c));
+  }
+
+  /* ---------------- Init ---------------- */
+
+  document.getElementById('resetBtn').addEventListener('click', resetAll);
+  document.getElementById('surfaceBtn').addEventListener('click', ()=>{
+    surfaceOn = !surfaceOn;
+    addProteinSurface();
+    viewer.render();
+  });
+
+  window.addEventListener('resize', ()=>{ if(viewer){ viewer.resize(); } });
+
+  initViewer();
+  renderLegend();
+  renderConjugatePanel();
+})();
+</script>
+</body>
+</html>

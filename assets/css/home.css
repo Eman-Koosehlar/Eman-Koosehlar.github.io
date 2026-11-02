@@ -1,0 +1,97 @@
+/* Homepage-only styles (hero, sections, contact). Shared tokens live in site.css. */
+
+/* Hero figure — the very first thing under the nav */
+.hero-figure { margin: 22px auto 0; width: min(1240px, calc(100% - 24px)); position: relative; }
+.hero-figure picture, .hero-figure img { display: block; width: 100%; height: auto; }
+.hero-figure img {
+  border-radius: 16px; border: 1px solid var(--line-2);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .55), 0 0 80px rgba(60, 120, 200, .10);
+  background: #050a10;
+  /* keep the full infographic visible on short/wide screens without cropping */
+  max-height: calc(100svh - var(--header-h) - 56px); object-fit: contain; margin-inline: auto;
+}
+.scroll-cue { display: flex; justify-content: center; padding: 18px 0 0; font: 11px var(--font-mono); letter-spacing: .18em; color: var(--dim); }
+.scroll-cue a { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; }
+.scroll-cue a span { animation: bob 2s ease-in-out infinite; color: var(--accent); }
+@keyframes bob { 50% { transform: translateY(5px); } }
+
+/* Intro (name + summary) */
+.intro { padding: 70px 0 40px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: end; }
+.intro h1 { font-size: clamp(46px, 7.4vw, 92px); line-height: .98; letter-spacing: -.055em; margin: 18px 0 12px; }
+.intro .role { font: 13px var(--font-mono); color: var(--accent); letter-spacing: .06em; margin: 0; }
+.intro .lead { color: var(--muted); font-size: 18px; max-width: 640px; margin: 0 0 22px; }
+.intro .tagline { font-size: clamp(22px, 2.6vw, 30px); letter-spacing: -.03em; line-height: 1.15; margin-bottom: 14px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.micro { margin-top: 22px; font: 11px var(--font-mono); color: var(--dim); }
+.micro span { color: var(--accent); }
+
+.ticker { border-block: 1px solid var(--line); background: var(--bg-2); overflow: hidden; }
+.ticker div { padding: 14px 20px; text-align: center; font: 11px var(--font-mono); letter-spacing: .22em; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ticker b { color: var(--accent); font-weight: 400; padding: 0 6px; }
+
+/* About */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+.statement { font-size: clamp(24px, 3vw, 36px); line-height: 1.18; letter-spacing: -.035em; }
+.statement strong { color: var(--accent); font-weight: 600; }
+.body-copy p { color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 26px; border-radius: var(--radius-sm); overflow: hidden; }
+.facts div { background: var(--panel); padding: 14px; }
+.facts small { display: block; font: 9px var(--font-mono); letter-spacing: .14em; color: var(--dim); }
+.facts strong { font-size: 13px; }
+
+/* Research interests */
+.interest-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.interest { border: 1px solid var(--line); background: var(--panel); border-radius: var(--radius); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+.interest .num { font: 11px var(--font-mono); color: var(--accent); }
+.interest h3 { font-size: 17px; }
+.interest p { font-size: 13.5px; color: var(--muted); margin: 0; flex: 1; }
+
+/* Projects — four consistent cards */
+.projects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.demo-note { margin-bottom: 22px; }
+
+/* Learning */
+.learning-section { background: var(--bg-2); border-block: 1px solid var(--line); }
+.learning-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 50px; }
+.learning-intro h3 { font-size: clamp(26px, 3vw, 38px); }
+.learning-intro p { color: var(--muted); margin: 16px 0 20px; }
+.topics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.topics div { background: var(--panel); padding: 18px; display: flex; flex-direction: column; gap: 3px; }
+.topics span { font: 10px var(--font-mono); color: var(--accent); }
+.topics small { color: var(--dim); font-size: 12px; }
+.wip { margin-top: 36px; }
+.wip h4 { font: 11px var(--font-mono); letter-spacing: .14em; color: var(--dim); margin-bottom: 14px; text-transform: uppercase; }
+.wip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.wip-card { border: 1px dashed var(--line-2); border-radius: var(--radius); padding: 18px; background: rgba(13, 18, 23, .6); }
+.wip-card b { font: 10px var(--font-mono); letter-spacing: .12em; color: var(--warn); }
+.wip-card h5 { font-size: 16px; margin: 8px 0 6px; letter-spacing: -.02em; }
+.wip-card p { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.wip-card .flow { font: 10px var(--font-mono); color: var(--accent); }
+
+.toolkit { display: flex; flex-wrap: wrap; gap: 10px; }
+.toolkit span { border: 1px solid var(--line-2); border-radius: 999px; padding: 8px 16px; font: 12px var(--font-mono); color: var(--muted); background: var(--panel); }
+
+/* Contact */
+.contact { padding: 90px 0; border-top: 1px solid var(--line); background: radial-gradient(circle at 20% 0, rgba(142, 231, 178, .06), transparent 50%); }
+.contact-inner { display: grid; grid-template-columns: 1.1fr .9fr; gap: 50px; align-items: center; }
+.contact h2 { font-size: clamp(32px, 4.6vw, 56px); margin: 14px 0; }
+.contact p { color: var(--muted); max-width: 520px; }
+.contact-links { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.contact-links a { display: flex; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 15px; }
+.contact-links a:last-child { border-bottom: 0; }
+.contact-links a:hover { background: var(--accent-soft); }
+.contact-links span { font: 12px var(--font-mono); color: var(--muted); }
+
+@media (max-width: 980px) {
+  .intro, .about-grid, .learning-grid, .contact-inner { grid-template-columns: 1fr; gap: 30px; }
+  .interest-grid { grid-template-columns: repeat(2, 1fr); }
+  .wip-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .section { padding: 60px 0; }
+  .projects, .interest-grid, .topics, .facts { grid-template-columns: 1fr; }
+  .hero-figure { width: calc(100% - 16px); margin-top: 12px; }
+  .hero-figure img { border-radius: 10px; }
+  .intro { padding-top: 44px; }
+  .ticker div { letter-spacing: .1em; font-size: 10px; }
+}
